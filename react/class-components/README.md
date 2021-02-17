@@ -310,8 +310,134 @@ This section may be confusing still, and that's OK. It's a convoluted concept th
 
 For React purposes though, you can just say "this is undefined? Forgot to bind" and add the binding call in the constructor.
 
+## Lifecycle Methods
+
+Sometimes in React you will want to do something when the component loads. You may think to go for the constructor, but when the constructor is called, the component isn't live on the page yet, it isn't "mounted" in React terms. This is a concept that relates to the Virtual DOM being aligned with the Browser DOM, React concepts that I will hopefully discuss in another tutorial. There are also times when you may want to do something when the component is updated, or even when the component is about to be removed (unmounted). For these use-cases, React has added in several lifecycle methods that we can hook into!
+
+These methods are features of the `Component` base class; the component base defines them, and it's up to us as the developer to give them a body. Once we've done that, the methods will be automatically called at the proper time!
+
+### `componentDidMount()`
+
+Often times you will want to do something when the component appears on the user's screen. This could be working with a third-party library, or it could be an opportunity to do some calculations based on the size of your elements in the DOM or to start a timer/fetch routine. Whatever it is, you can do it in this method:
+
+```jsx
+class AlertOnLoad extends React.Component {
+    componentDidMount() {
+        alert("You've loaded this component into the DOM!");
+    }
+
+    render() {
+        // some render method
+    }
+}
+```
+
+### `componentDidUpdate()`
+
+This method is called any time the component is updated after the original mount (and **only** on updates, this method is not called for the initial render). It could be used to update state (based on some conditions) or any other modifications that may need to be made if the component's state changes and you need to react to it (no pun intended).
+
+While you can use `setState` within this method, you **must** do so inside a conditional block.
+
+```jsx
+class Counter extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { count: 0, done: false };
+    }
+
+    componentDidUpdate() {
+        if (this.state.count > 10) {
+            this.setState({ done: true });
+        }
+    }
+
+    render() {
+        // some render method
+    }
+}
+```
+
+### `componentWillUnmount()`
+
+The final lifecycle method we'll look into is the `componentWillUnmount` method. This is called when a component is going to be removed from the DOM, either because the user navigated away from the page or the component is being removed due to some condition. Most use-cases will be for canceling some subscription or timer to prevent memory leaks. The below code is based on the [time example from the Official React Docs](https://reactjs.org/docs/state-and-lifecycle.html) and if you have any confusion, head over there for more insight.
+
+```jsx
+class Fetcher extends React.Component {
+    constructor(props) {
+        this.state = {
+            timer: new Date() // start timer now
+        };
+    }
+
+    componentDidMount() {
+        this.timer = setInterval(() => {
+            this.setState({ timer: new Date() }) // update the timer
+        });
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timer); // stop the timer
+    }
+
+    render() {
+        // some render method
+    }
+}
+```
+
+## Instance properties (not state or input properties)
+
+It's also possible to define properties on a component beyond the state and input properties. In cases where you don't want your component to update if a value changes, then you can simply define an instance variable instead of a property on state.
+
+You can freely update the properties inside of any methods of the component, but keep in mind that updates to these properties will **not** result in an update for the component. Only state changes and prop changes will do that.
+
+You may use these properties to define `refs` or state that doesn't affect display.
+
+```jsx
+class Instance extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.renderCount = 0;
+
+        this.setState({
+            count: 0
+        })
+    }
+
+    onComponentDidUpdate() {
+        this.renderCount += 1;
+        // this will not cause another update for the component
+        // the render count will not always match the state.count
+        // it will simply keep track of how many times the component
+        // has updated
+    }
+
+    increment() {
+        this.setState(prev => ({
+            count: prev.count + 1 
+        }));
+    }
+
+    decrement() {
+        this.setState(prev => ({
+            count: prev.count - 1
+        }));
+    }
+
+    render() {
+        return (
+            <>
+                <button onClick={this.decrement}>-</button>
+                {this.state.count}
+                <button onClick={this.increment}>+</button>
+        )
+    }
+}
+```
+
 ## Conclusion
 
-This wraps up class components for now. There are some more concepts out there like the, most notably the life cycle methods provided by the `Component` class, so this document is just a work in progress, but is hopefully adequate enough for now to get you started.
+This wraps up class components for now. There are additional lifecycle methods to explore, but the ones listed above are by far the most popular.
 
 The `index.html` file in this section creates a simple `Counter` component that - in a very contrived manner - wraps all these concepts into a small package. You should understand what each of the parts is doing; ideally no line should be confusing to you.
