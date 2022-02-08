@@ -82,7 +82,7 @@ console.log(result[0]); // logs "goodbye"
 ```
 
 The above is an extremely contrived example, you would almost never set state in this way and immediately, it's to demonstrate the return values.
-This kind of state setting has _huge_ implications for component re-renders, but we'll talk about that in a bit.
+This kind of state setting has _huge_ implications for component re-renders, but that's a more advanced topic you can read about in the React docs.
 You'll also notice that it's super weird to be calling the function with the syntax `result[1]("goodbye")`, and that's why most developers utilize [destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) instead.
 
 ```jsx
