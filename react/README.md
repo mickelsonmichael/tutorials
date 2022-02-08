@@ -17,3 +17,4 @@ Simply open the `index.html` file for the topic in any compatible browser to vie
 ## Recommended Reading Order
 
 1. [Class Components](./class-components/README.md)
+2. [Functional Components](./functional-components/README.md)
